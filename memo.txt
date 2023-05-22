@@ -1,0 +1,3 @@
+Modifiersの
+Restricting motion to the draggable node's scroll container bounding rectangle
+がもろにやりたいことっぽいですね
