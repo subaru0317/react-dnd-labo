@@ -1,26 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import Spell from "./Spell";
 import { useDrop } from "react-dnd";
 import "../App.css";
 import { v4 as uuidv4 } from "uuid";
-import { border } from "@chakra-ui/react";
-
-const reorder = (list, startIndex, endIndex) => {
-  const result = Array.from(list);
-  const [removed] = result.splice(startInidex, 1);
-  result.splice(endIndex, 0, removed);
-
-  return result;
-}
-
-const copy = (src, dst, droppableSrc, droppableDst) => {
-  const srcClone = Array.from(src);
-  const dstClone = Array.from(dst);
-  const item = srcClone[droppableSrc.index];
-
-  dstClone.splice(droppableDst.index, 0, { ...item, id: uuid() });
-  return dstClone;
-}
+import update from "immutability-helper";
 
 // list to listのための関数なのでたぶん不要
 // const move = (src, dst, droppableSrc, droppableDst) => {
@@ -56,46 +39,24 @@ const SpellList = [
   },
 ]
 
-function isSpell(x) {
-  const number = parseInt(x, 10);
-
-  if (!isNaN(number) && number >= 1 && number <= 3)
-    return true;
-  
-  return false;
-}
-
 function DragDrop() {
   const [board, setBoard] = useState([]);
   const [{ isOver }, drop] = useDrop(() => ({
     accept: "image",
-    // item はドロップされたitemの情報
+    // item はドロップされたアイテムの情報
+    // 詳しくはSpellのitem情報のものが来る
     drop: (item) => {
       // IDがSpellListのものと一致する場合
       // 新しくBoardに複製して追加
-      if (isSpell(item.id)) {
+      if (SpellList.some(spell => spell.id === item.id))
         addImageToBoard(item);
-      }
-      else if (board.some(spell => spell.id === item.id)) {
-        return ;
-      }
+      // 並び替え
+      // else if (board.some(spell => spell.id === item.id)) {
+      //   return ;
+      // }
       else {
         return ;
       }
-      // switch (item.id) {
-      //   // 並び替えを実行する: Sortable
-      //   case board.id:
-      //     reorder(board, src.index, dst.index);
-      //     break;
-      //   // Boardに追加する
-      //   case SpellList.id:
-      //     addImageToBoard(item.id);
-      //     break;
-      //   // ドラッグしたSpellを削除
-      //   default:
-      //     addImageToBoard(item.id);
-      //     break;
-      // }
     },
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
@@ -104,19 +65,31 @@ function DragDrop() {
 
   const addImageToBoard = (item) => {
     const cloneSpell = {...item, id: uuidv4()};
-    console.log(cloneSpell);
     setBoard((prevboard) => ([...prevboard, cloneSpell]));
   };
+
+  // この中身が未完成
+  const handleSort = useCallback((dragIndex, hoverIndex) => {
+    setBoard((prevRows) =>
+      update(prevRows, {
+        $splice: [
+          [dragIndex, 1],
+          [hoverIndex, 0, prevRows[dragIndex]]
+        ]
+      })
+    );
+  }, []);
+
   return (
     <>
       <div className="Pictures">
         {SpellList.map((spell) => {
-          return <Spell id={spell.id} name={spell.name} path={spell.path} key={uuidv4()} />;
+          return <Spell spell={spell} key={uuidv4()} />;
         })}
       </div>
       <div className="Board" ref={drop}>
         {board.map((spell, index) => {
-          return <Spell id={spell.id} name={spell.name} path={spell.path} key={uuidv4()} />;
+          return <Spell spell={spell} key={uuidv4()} onSortEnd={handleSort} index={index}/>;
         })}
       </div>
     </>
