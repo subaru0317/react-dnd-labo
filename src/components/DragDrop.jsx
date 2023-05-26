@@ -40,7 +40,7 @@ const SpellList = [
 ]
 
 function DragDrop() {
-  const [board, setBoard] = useState([]);
+  const [boarditems, setBoard] = useState([]);
   const [{ isOver }, drop] = useDrop(() => ({
     accept: "image",
     // item はドロップされたアイテムの情報
@@ -51,7 +51,7 @@ function DragDrop() {
       if (SpellList.some(spell => spell.id === item.id))
         addImageToBoard(item);
       // 並び替え
-      // else if (board.some(spell => spell.id === item.id)) {
+      // else if (boarditems.some(spell => spell.id === item.id)) {
       //   return ;
       // }
       else {
@@ -80,6 +80,7 @@ function DragDrop() {
     );
   }, []);
 
+
   return (
     <>
       <div className="Pictures">
@@ -88,9 +89,9 @@ function DragDrop() {
         })}
       </div>
       <div className="Board" ref={drop}>
-        {board.map((spell, index) => {
-          return <Spell spell={spell} key={uuidv4()} onSortEnd={handleSort} index={index}/>;
-        })}
+        {boarditems.map((spell, index) => (
+          <Spell spell={spell} key={uuidv4()} onSortEnd={handleSort} index={index}/>
+        ))}
       </div>
     </>
   );
