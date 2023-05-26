@@ -45,14 +45,13 @@ function Spell({ spell, index, onSortEnd }) {
       if (dragIndex > hoverIndex && hoverClientX > hoverMiddleX) {
         return;
       }
-
-      onSortEnd(dragIndex, hoverIndex);
+      if (typeof dragIndex !== "undefined" && typeof hoverIndex !== "undefined")
+        onSortEnd(dragIndex, hoverIndex);
       item.index = hoverIndex;
     }
   });
 
   drag(drop(ref));
-
   return (
     <Image
       ref={ref}

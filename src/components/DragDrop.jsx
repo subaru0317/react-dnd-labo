@@ -70,17 +70,17 @@ function DragDrop() {
 
   // この中身が未完成
   const handleSort = useCallback((dragIndex, hoverIndex) => {
-    setBoard((prevRows) =>
-      update(prevRows, {
+    setBoard((prevColumns) =>
+      update(prevColumns, {
         $splice: [
           [dragIndex, 1],
-          [hoverIndex, 0, prevRows[dragIndex]]
+          [hoverIndex, 0, prevColumns[dragIndex]]
         ]
       })
     );
   }, []);
 
-
+  console.log(boarditems);
   return (
     <>
       <div className="Pictures">
