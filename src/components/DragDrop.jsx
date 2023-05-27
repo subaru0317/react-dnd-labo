@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import Spell from "./Spell";
+import Spell from "./DraggableSpell";
 import { useDrop } from "react-dnd";
 import "../App.css";
 import { v4 as uuidv4 } from "uuid";
@@ -80,12 +80,16 @@ function DragDrop() {
     );
   }, []);
 
+  const handleAddToBoard = useCallback((item) => {
+    addImageToBoard(item);
+}, [addImageToBoard]);
+
   console.log(boarditems);
   return (
     <>
       <div className="Pictures">
         {SpellList.map((spell) => {
-          return <Spell spell={spell} key={uuidv4()} />;
+          return <Spell spell={spell} key={uuidv4()} onAddToBoard={handleAddToBoard}/>;
         })}
       </div>
       <div className="Board" ref={drop}>
